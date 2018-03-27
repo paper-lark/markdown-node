@@ -1,0 +1,22 @@
+{
+  "name": "markdown-parser",
+  "version": "0.0.0",
+  "description": "Lightweight Markdown parser",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc --watch",
+    "prestart": "yarn compile",
+    "start": "node ./index.js",
+    "pretest": "yarn compile",
+    "test": "jest test/*.js"
+  },
+  "author": "Max Zhurasky <paperlark@yandex.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^9.4.7",
+    "jest": "^22.4.3"
+  }
+}
