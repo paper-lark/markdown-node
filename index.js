@@ -1,11 +1,11 @@
 const parser = require('./lib/parser');
 
 const data =
-  'This is a paragraph.\n' +
-  '> Wise men say\n' +
-  '> \n' +
-  '> Only fools rush in...\n' +
-  'This is the end!\n';
+  '# Header\n' +
+  'Here is some text.\n' +
+  'This is the second sentence.\n' +
+  '\n' +
+  'This is the second paragraph.';
 const output = parser(data);
 
 console.log(output);

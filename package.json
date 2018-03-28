@@ -1,8 +1,8 @@
 {
-  "name": "markdown-parser",
-  "version": "0.0.0",
-  "description": "Lightweight Markdown parser",
-  "main": "index.js",
+  "name": "markdown-node",
+  "version": "0.1.0",
+  "description": "Lightweight Markdown parser module for Node.js",
+  "main": "/lib/parser.js",
   "scripts": {
     "compile": "tsc",
     "watch": "tsc --watch",
@@ -13,8 +13,9 @@
   },
   "author": "Max Zhurasky <paperlark@yandex.com>",
   "license": "MIT",
-  "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "prismjs": "^1.13.0"
+  },
   "devDependencies": {
     "@types/node": "^9.4.7",
     "jest": "^22.4.3"

@@ -152,7 +152,7 @@ test('links', () => {
 test('code blocks', () => {
   const data =
     'This is a block of code:\n' +
-    '```\n' +
+    '``` javascript \n' +
     'let i = 10;\n' +
     'while (i > 0) {\n' +
     '  console.log(i);\n' +
@@ -168,23 +168,8 @@ test('code blocks', () => {
     '  console.log(i);\n' +
     '}\n' +
     '```\n';
-  const result =
-    '<p>This is a block of code:</p>' +
-    '<pre>' +
-    'let i = 10;\n' +
-    'while (i > 0) {\n' +
-    '  console.log(i);\n' +
-    '  i--;\n' +
-    '}\n' +
-    '</pre>' +
-    '<p>This is another block:</p>' +
-    '<pre>' +
-    'let i = 10;\n' +
-    'for (let i = 0; i < 10; i++) {\n' +
-    '  console.log(i);\n' +
-    '}\n' +
-    '</pre>';
-  expect(parser(data)).toEqual(result);
+  const result = /<p>This is a block of code:<\/p><pre>[^]*<\/pre><p>This is another block:<\/p><pre>[^]*<\/pre>/;
+  expect(parser(data)).toMatch(result);
 });
 
 test('images', () => {
@@ -196,43 +181,6 @@ test('images', () => {
     '<p><img src="http://lorempixel.com/400/200" alt="Picture #1"></p>' +
     '<p>This is another picture <img src="http://lorempixel.com/600/300" alt="Picture #2"></p>';
   expect(parser(data)).toEqual(result);
-});
-
-test('CSS classes', () => {
-  const data =
-    'This is the first paragraph.\n' +
-    'Here is some more text.\n' +
-    '\n' +
-    '- List #1\n' +
-    '- List #2\n' +
-    'This is a block of code:\n' +
-    '```\n' +
-    'let i = 10;\n' +
-    'while (i > 0) {\n' +
-    '  console.log(i);\n' +
-    '  i--;\n' +
-    '}\n' +
-    '```\n';
-  const classes = {
-    p: ['para'],
-    ul: ['ulist'],
-    pre: ['prettyprint', 'js']
-  };
-  const result =
-    '<p class="para">This is the first paragraph. Here is some more text.</p>' +
-    '<ul class="ulist">' +
-    '<li>List #1</li>' +
-    '<li>List #2</li>' +
-    '</ul>' +
-    '<p class="para">This is a block of code:</p>' +
-    '<pre class="prettyprint js">' +
-    'let i = 10;\n' +
-    'while (i > 0) {\n' +
-    '  console.log(i);\n' +
-    '  i--;\n' +
-    '}\n' +
-    '</pre>';
-  expect(parser(data, classes)).toEqual(result);
 });
 
 test('blockquotes', () => {

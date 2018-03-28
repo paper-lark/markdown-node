@@ -1,3 +1,5 @@
+const Prism = require('prismjs');
+
 /**
  * Inline tag.
  */
@@ -199,22 +201,12 @@ function processInlineTokens(markup: string): string {
  *
  * @param {Mode} current Current mode
  * @param {Mode} mode New mode
- * @param {ICSSClass} classes CSS classes object.
  * @returns {string} Tag to append
  */
-function completeMode(current: Mode, mode: Mode, classes: ICSSClass): string {
+function completeMode(current: Mode, mode: Mode): string {
   if (current !== mode) {
     const first = current !== Mode.Idle ? '</' + current + '>' : '';
-    const className = classes[mode]
-      ? classes[mode].reduce((prev, cur) => prev + ' ' + cur)
-      : '';
-    const second =
-      mode !== Mode.Idle
-        ? '<' +
-          mode +
-          (className !== '' ? ' class="' + className + '"' : '') +
-          '>'
-        : '';
+    const second = mode !== Mode.Idle ? '<' + mode + '>' : '';
     return first + second;
   } else {
     return '';
@@ -235,30 +227,30 @@ function headerDepth(line: string): number {
 
 /**
  * Main function.
- * Parses markup passed and coverts it to HTML
- * with attached CSS classes taken from the second argument.
- * Only paragraph, list and code block CSS classes supported.
+ * Parses markup passed and converts it to HTML.
  *
  * @param {string} markup Markup text.
- * @param {ICSSClass} classes CSS classes object.
  * @returns {string} - HTML text.
  */
-function parser(markup: string, classes: ICSSClass = {}): string {
+function parser(markup: string): string {
   const lines: string[] = markup.split('\n');
   let result: string = ''; // result
   let mode: Mode = Mode.Idle; // current parser mode
   let isPreviousBreak = false; // used in blockquote to signal that a previous string was a line break
+  let lang: string = 'javascript';
 
   lines.forEach(line => {
     /* Check if the line is a start of the code block */
     if (line.substr(0, 3) === '```') {
       /* Code block switch */
       if (mode !== Mode.Code) {
-        result += completeMode(mode, Mode.Code, classes);
+        lang = line.substr(3).trim();
+        lang = line.length > 3 && lang !== '' ? lang : 'javascript';
+        result += completeMode(mode, Mode.Code);
         mode = Mode.Code;
         return;
       } else {
-        result += completeMode(mode, Mode.Idle, classes);
+        result += completeMode(mode, Mode.Idle);
         mode = Mode.Idle;
         return;
       }
@@ -269,12 +261,12 @@ function parser(markup: string, classes: ICSSClass = {}): string {
       line = line.trim(); // TODO: list depth!
       if (line === '---' || line === '___') {
         /* Line separator */
-        result += completeMode(mode, Mode.Idle, classes) + '<hr>';
+        result += completeMode(mode, Mode.Idle) + '<hr>';
         mode = Mode.Idle;
         return;
       } else if (line === '') {
         /* Empty line */
-        result += completeMode(mode, Mode.Idle, classes);
+        result += completeMode(mode, Mode.Idle);
         mode = Mode.Idle;
         return;
       }
@@ -284,14 +276,14 @@ function parser(markup: string, classes: ICSSClass = {}): string {
     /* Chain depending on the first character */
     if (mode === Mode.Code) {
       /* Code inside a code block */
-      result += line + '\n';
+      result += Prism.highlight(line, Prism.languages[lang], lang) + '\n';
     } else if (line.charAt(0) === '#') {
       /* Header */
       let depth = headerDepth(line);
       line = line.substr(depth).trim();
       depth = Math.min(depth, 6);
       result +=
-        completeMode(mode, Mode.Idle, classes) +
+        completeMode(mode, Mode.Idle) +
         '<h' +
         depth +
         '>' +
@@ -303,7 +295,7 @@ function parser(markup: string, classes: ICSSClass = {}): string {
     } else if (line.charAt(0) === '-') {
       /* List */
       result +=
-        completeMode(mode, Mode.List, classes) +
+        completeMode(mode, Mode.List) +
         '<li>' +
         line.substr(1).trim() +
         '</li>';
@@ -312,7 +304,7 @@ function parser(markup: string, classes: ICSSClass = {}): string {
       /* Blockquote */
       line = line.substr(1).trim();
       result +=
-        completeMode(mode, Mode.Blockquote, classes) +
+        completeMode(mode, Mode.Blockquote) +
         (mode === Mode.Blockquote && !isPreviousBreak && line !== ''
           ? ' '
           : '') +
@@ -322,7 +314,7 @@ function parser(markup: string, classes: ICSSClass = {}): string {
     } else {
       /* Plain text */
       result +=
-        completeMode(mode, Mode.Plain, classes) +
+        completeMode(mode, Mode.Plain) +
         (mode === Mode.Plain ? ' ' : '') +
         line;
       mode = Mode.Plain;
@@ -330,7 +322,7 @@ function parser(markup: string, classes: ICSSClass = {}): string {
   });
 
   /* Append closing tag if necessary */
-  result += completeMode(mode, Mode.Idle, classes);
+  result += completeMode(mode, Mode.Idle);
 
   return result;
 }
